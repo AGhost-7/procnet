@@ -5,13 +5,13 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha",
-    "doc": "jsdoc -d doc index.js"
+    "doc": "rm -r doc && jsdoc -d doc index.js"
   },
   "keywords": [
     "rpc",
     "server",
     "client",
-		"soa"
+    "soa"
   ],
   "author": "Jonathan Boudreau <jonathan.boudreau.92@gmail.com>",
   "license": "MIT",
@@ -25,5 +25,5 @@
     "jshint": "^2.8.0",
     "mocha": "^2.3.0",
     "pogostick-http": "^1.2.0"
-  }
+	}
 }

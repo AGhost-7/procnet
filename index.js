@@ -1,14 +1,20 @@
 
+'use strict';
 
 var mkFn = require('mk-fn');
 
+/** @module procnet */
 var procnet = {};
 
 /** 
- * More like syntatic sugar for defining services. You could technically DIY. 
+ * More like syntatic sugar for defining services. 
+ *
+ * @function service
+ * @static
  * @param {array} dependencies Is an array of strings where each string is the name of the
  * service that the service requires to run.
- * @param {function} factory Is the funciton which returns the list of procedures.
+ * @param {function} factory Is the funciton which returns the list of procedures. 
+ * @returns function
  */
 procnet.service = function service (dependencies, factory) {	
 	var instantiator = arguments.length > 1 ? arguments[1] : arguments[0];		
@@ -19,6 +25,12 @@ procnet.service = function service (dependencies, factory) {
 /** 
  * Takes the configuration with the type and then the name and changes it into a object 
  * with the name of the services as the key.
+ *
+ * @private
+ * @function _flattenConfig
+ * @static
+ * @param {object} config Is the user-specified configuration to be flattened.
+ * @returns object
  */
 procnet._flattenConfig = function _flattenConfig(config) {
 	var res = {};
@@ -35,10 +47,16 @@ procnet._flattenConfig = function _flattenConfig(config) {
 
 /** 
  * Load all dependencies for the user to create the service. 
- * @param {object} factories
- * @param {object} config
- * @param {array} dependencies
- * @param {function} cb
+ *
+ * @private
+ * @static
+ * @function _loadServices
+ * @param {object} factories Is a promise factory.
+ * @param {object} config Is the flattened configuration file for all dependencies.
+ * @param {array} dependencies Is an array of the dependency names.
+ * @param {function} cb Complete handler. Either get and error or an array of the 
+ * remotes in the order given by the dependencies argument.
+ * @returns void
  */
 procnet._loadServices = function _loadServices(factories, config, dependencies, cb) {
 	var remotes = [];
@@ -63,12 +81,15 @@ procnet._loadServices = function _loadServices(factories, config, dependencies, 
  * Asynchronous dependency loader for setting up services. This will load up the service 
  * and return the precedures object that the service generates.
  *
+ * @static
+ * @function loader
  * @param {object} factories Is a map of service names which translate to a function 
  * accepting an option and a callback.
  * @param {object} config The configuration is used to store data which could be 
  * server-specific as well as other things such as ip addresses. Each factory is given the
  * corresponding configuration needed to create the instance it is being asked to 
  * generate.
+ * @returns function
  */
 procnet.loader = function loader(factories, config) {
 	// start by flattening the config since I dont need to know
@@ -90,7 +111,9 @@ procnet.loader = function loader(factories, config) {
  * A client is nothing more than a consumer. A good example would be a  server with a REST
  * api trying to call remote services using procnet. It could of course also be a browser 
  * client trying to fetch data from remote servers.
- * 
+ *
+ * @static
+ * @function client
  * @see loader
  */ 
 procnet.client = function client(factories, config) {
@@ -112,8 +135,12 @@ procnet.client = function client(factories, config) {
 /** 
  * Utility function for mocking service procedures for unit testing. It only makes the 
  * function always returna promise, which generated services don't always do.
+ *
+ * @static
+ * @function mockFn
  * @param {function} promise Is a promise factory.
  * @param {function} fn Is the function to mock.
+ * @returns function
  */
 procnet.mockFn = function mockFn(promise, fn) {
 	return mkFn(fn.length, function() {
@@ -128,9 +155,13 @@ procnet.mockFn = function mockFn(promise, fn) {
 /** 
  * Takes in a object with functions and ensures that they always return a promise. Useful 
  * for injecting them into services as fake networked remotes.
+ *
+ * @static
+ * @function mockRemote
  * @param {function} promise is a promise factory.
  * @param {object} mock is the set of functions to mock. Can also contain objects, where 
  * the functons inside of that object will be mocked.
+ * @returns object
  */ 
 procnet.mockRemote = function mockRemote(promise, mock) {
 	return Object.keys(mock).reduce(function(obj, k) {
@@ -171,11 +202,13 @@ procnet.mockRemote = function mockRemote(promise, mock) {
  * 		assert.equal(r, 7);
  * 	});
  * </pre></code>
- *
+ * @static
+ * @function mocker
  * @param {function} promise is the promise factory
  * @param {object} mocks is an object where the key is the name of the service.
  * @param {function} service is the function returning an object will all of the 
  * procedures.
+ * @returns function
  */
 procnet.mocker = function mocker(promise) {
 	return function(mocks, service) {
@@ -188,7 +221,5 @@ procnet.mocker = function mocker(promise) {
 	};
 };
 
-if(module && module.exports)
-	module.exports = procnet;
-else
-	window.procnet = procnet;
+module.exports = procnet;
+
