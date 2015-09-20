@@ -1,7 +1,7 @@
 read -p 'Commit message: ' msg
 npm run doc
 git add -A
-git commit -m 'Update documentation'
+git commit -m "$msg"
 git checkout gh-pages
 git checkout master -- doc
 mv doc/* ..
