@@ -30,23 +30,25 @@
 
 var mkFn = require('mk-fn');
 
+var procnet = {};
+
 /** 
  * More like syntatic sugar for defining services. You could technically DIY. 
- * @param {array} dependencies Is an array of strings where each string is the name of the service
- * that the service requires to run.
+ * @param {array} dependencies Is an array of strings where each string is the name of the
+ * service that the service requires to run.
  * @param {function} factory Is the funciton which returns the list of procedures.
  */
-exports.service = function service (dependencies, factory) {	
+procnet.service = function service (dependencies, factory) {	
 	var instantiator = arguments.length > 1 ? arguments[1] : arguments[0];		
 	instantiator._dependencies = arguments.length > 1 ? arguments[0] : [];
 	return instantiator;	
 };
 
 /** 
- * Takes the configuration with the type and then the name and changes it into
- * a object with the name of the services as the key.
+ * Takes the configuration with the type and then the name and changes it into a object 
+ * with the name of the services as the key.
  */
-exports._flattenConfig = function _flattenConfig(config) {
+procnet._flattenConfig = function _flattenConfig(config) {
 	var res = {};
 	for(var type in config) {
 		var typeSpace = config[type];
@@ -66,18 +68,18 @@ exports._flattenConfig = function _flattenConfig(config) {
  * @param {array} dependencies
  * @param {function} cb
  */
-exports._loadServices = function _loadServices(factories, config, dependencies, cb) {
+procnet._loadServices = function _loadServices(factories, config, dependencies, cb) {
 	var remotes = [];
 	function reduce(i) {
-		if(deps.length >= dependencies.length) {
-			cb(null, deps);
+		if(remotes.length >= dependencies.length) {
+			cb(null, remotes);
 		} else {
 			var depName = dependencies[i];
 			var remoteConf = config[depName];
 			var type = remoteConf._serviceType;
 			factories[type](remoteConf, function(err, remote) {
 				if(err) return cb(err);
-				deps.push(remote);
+				remotes.push(remote);
 				reduce(i + 1);
 			});
 		}
@@ -86,19 +88,20 @@ exports._loadServices = function _loadServices(factories, config, dependencies, 
 };
 
 /** 
- * Asynchronous dependency loader for setting up services. This will load up the service
+ * Asynchronous dependency loader for setting up services. This will load up the service 
  * and return the precedures object that the service generates.
  *
- * @param {object} factories Is a map of service names which translate to a function accepting an 
- * option and a callback.
- * @param {object} config The configuration is used to store data which could be server-specific as
- * well as other things such as ip addresses. Each factory is given the corresponding 
- * configuration needed to create the instance it is being asked to generate.
+ * @param {object} factories Is a map of service names which translate to a function 
+ * accepting an option and a callback.
+ * @param {object} config The configuration is used to store data which could be 
+ * server-specific as well as other things such as ip addresses. Each factory is given the
+ * corresponding configuration needed to create the instance it is being asked to 
+ * generate.
  */
-exports.loader = function loader(factories, config) {
+procnet.loader = function loader(factories, config) {
 	// start by flattening the config since I dont need to know
 	// more information to do that
-	var flatConfig = _flattenConfig(config);
+	var flatConfig = procnet._flattenConfig(config);
 
 	return function(service, cb) {
 		// load services
@@ -107,21 +110,30 @@ exports.loader = function loader(factories, config) {
 			var procs = service.apply(null, remotes);
 			cb(null, procs);
 		}
-		_loadServices(factories, flatConfig, service._dependencies, whenLoaded);
+		procnet._loadServices(factories, flatConfig, service._dependencies, whenLoaded);
 	};
 };
 
 /** 
- * A client is nothing more than a consumer. A good example would be a  server with a 
- * REST api trying to call remote services using procnet. It could of course also be a 
- * browser client trying to fetch data from remote servers.
+ * A client is nothing more than a consumer. A good example would be a  server with a REST
+ * api trying to call remote services using procnet. It could of course also be a browser 
+ * client trying to fetch data from remote servers.
  * 
  * @see loader
  */ 
-exports.client = function client(factories, config) {
-	var flatConfig = _flattenConfig(config);
+procnet.client = function client(factories, config) {
+	var flatConfig = procnet._flattenConfig(config);
 	return function(deps, cb) {
-		_loadServices(factories, flatConfig, deps, cb);
+		procnet._loadServices(factories, flatConfig, deps, function(err, remotes) {
+			if(err) return cb(err);
+
+			var remoteObj = deps.reduce(function(obj, name, i) {
+				obj[name] = remotes[i];
+				return obj;
+			}, {});
+			cb(null, remoteObj);
+
+		});
 	};
 };
 
@@ -131,7 +143,7 @@ exports.client = function client(factories, config) {
  * @param {function} promise Is a promise factory.
  * @param {function} fn Is the function to mock.
  */
-exports.mockFn = function mockFn(promise, fn) {
+procnet.mockFn = function mockFn(promise, fn) {
 	return mkFn(fn.length, function() {
 		var args = arguments;
 		var t = this;
@@ -142,26 +154,26 @@ exports.mockFn = function mockFn(promise, fn) {
 };
 
 /** 
- * Takes in a object with functions and ensures that they always return a promise. 
- * Useful for injecting them into services as fake networked remotes.
+ * Takes in a object with functions and ensures that they always return a promise. Useful 
+ * for injecting them into services as fake networked remotes.
  * @param {function} promise is a promise factory.
- * @param {object} mock is the set of functions to mock. Can also contain objects, where the
- * functons inside of that object will be mocked.
+ * @param {object} mock is the set of functions to mock. Can also contain objects, where 
+ * the functons inside of that object will be mocked.
  */ 
-exports.mockRemote = function mockRemote(promise, mock) {
+procnet.mockRemote = function mockRemote(promise, mock) {
 	return Object.keys(mock).reduce(function(obj, k) {
 		// this should be able to handle deep objects.
 		if(typeof mock[k] === 'function')
-			obj[k] = mockFn(promise, mock[k]);
+			obj[k] = procnet.mockFn(promise, mock[k]);
 		else
-			obj[k] = mockRemote(promise, mock[k]);
+			obj[k] = procnet.mockRemote(promise, mock[k]);
 		return obj;
 	}, {});
 };
 
 /** 
  * To unit test, one will need to use mocking due to the services having external 
- * dependencies. Since procnet is so simple, you can still call directly the procedures
+ * dependencies. Since procnet is so simple, you can still call directly the procedures 
  * once the service is instantianted.
  *
  * &lt;code>&lt;pre>
@@ -190,19 +202,24 @@ exports.mockRemote = function mockRemote(promise, mock) {
  *
  * @param {function} promise is the promise factory
  * @param {object} mocks is an object where the key is the name of the service.
- * @param {function} service is the function returning an object will all of the procedures.
+ * @param {function} service is the function returning an object will all of the 
+ * procedures.
  */
-exports.mocker = function mocker(promise) {
+procnet.mocker = function mocker(promise) {
 	return function(mocks, service) {
 		var mocked = service._dependencies.map(function(depName) {
 			var dep = mocks[depName];
-			return mockRemote(promise, mocks[depName]);			
+			return procnet.mockRemote(promise, mocks[depName]);			
 		});
 
-		return mockRemote(promise, service.apply(null, mocked));
+		return procnet.mockRemote(promise, service.apply(null, mocked));
 	};
 };
 
+if(module &amp;&amp; module.exports)
+	module.exports = procnet;
+else
+	window.procnet = procnet;
 </code></pre>
         </article>
     </section>
@@ -213,13 +230,13 @@ exports.mocker = function mocker(promise) {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#_flattenConfig">_flattenConfig</a></li><li><a href="global.html#_loadServices">_loadServices</a></li><li><a href="global.html#client">client</a></li><li><a href="global.html#loader">loader</a></li><li><a href="global.html#mocker">mocker</a></li><li><a href="global.html#mockFn">mockFn</a></li><li><a href="global.html#mockRemote">mockRemote</a></li><li><a href="global.html#service">service</a></li></ul>
+    <h2><a href="index.html">Home</a></h2>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a> on Fri Sep 18 2015 22:10:18 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a> on Sun Sep 20 2015 15:29:22 GMT-0400 (EDT)
 </footer>
 
 <script> prettyPrint(); </script>
