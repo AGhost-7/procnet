@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha",
-    "doc": "rm -r doc && jsdoc -d doc index.js"
+    "doc": "rm -rf doc && jsdoc -d doc index.js"
   },
   "keywords": [
     "rpc",
