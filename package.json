@@ -1,0 +1,29 @@
+{
+  "name": "procnet",
+  "version": "1.0.0",
+  "description": "procnet is a remote service provider",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha",
+    "doc": "jsdoc -d doc index.js"
+  },
+  "keywords": [
+    "rpc",
+    "server",
+    "client",
+		"soa"
+  ],
+  "author": "Jonathan Boudreau <jonathan.boudreau.92@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "mk-fn": "^1.0.0"
+  },
+  "devDependencies": {
+    "bluebird": "^2.10.0",
+    "chai": "^3.2.0",
+    "jsdoc": "^3.3.2",
+    "jshint": "^2.8.0",
+    "mocha": "^2.3.0",
+    "pogostick-http": "^1.2.0"
+  }
+}
