@@ -64,7 +64,8 @@ describe('server instancing', function() {
 			]).spread(function(sum, per) {
 				expect(sum).to.equal(3);
 				expect(per).to.equal(8);
-			});
+				
+			}).finally(done);
 
 		});
 	});
@@ -72,6 +73,7 @@ describe('server instancing', function() {
 	after(function(done) {
 		mathServer.close();
 		rectangleServer.close();
+		done();
 	});
 
 });
