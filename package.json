@@ -11,7 +11,9 @@
     "rpc",
     "server",
     "client",
-    "soa"
+    "soa",
+		"microservices",
+		"services"
   ],
   "author": "Jonathan Boudreau <jonathan.boudreau.92@gmail.com>",
   "license": "MIT",

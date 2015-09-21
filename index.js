@@ -18,6 +18,7 @@ var procnet = {};
  */
 procnet.service = function service (dependencies, factory) {	
 	var instantiator = arguments.length > 1 ? arguments[1] : arguments[0];		
+	// This is NOT part of the public API and thus can be changed at any time.
 	instantiator._dependencies = arguments.length > 1 ? arguments[0] : [];
 	return instantiator;	
 };
@@ -38,6 +39,7 @@ procnet._flattenConfig = function _flattenConfig(config) {
 		var typeSpace = config[type];
 		for(var name in typeSpace) {
 			var nameSpace = typeSpace[name];
+			// private property, might be changed without major version bump.
 			nameSpace._serviceType = type;
 			res[name] = nameSpace;
 		}
@@ -114,6 +116,8 @@ procnet.loader = function loader(factories, config) {
  *
  * @static
  * @function client
+ * @param {object} factories Contains all of the instanciators for the service types.
+ * @param {object} config Has the configuration for each of the services.
  * @see loader
  */ 
 procnet.client = function client(factories, config) {
