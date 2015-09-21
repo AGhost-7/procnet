@@ -30,6 +30,6 @@ module.exports = procnet.service(['math'], function(math) {
 });
 ```
 
-### Documentation
+### Read More
 - [API Docs](http://aghost-7.github.io/procnet/module-procnet.html)
 - [Tests](https://github.com/AGhost-7/procnet/tree/master/test)
