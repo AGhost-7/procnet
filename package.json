@@ -1,6 +1,6 @@
 {
   "name": "procnet",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "procnet is a remote service provider",
   "main": "index.js",
   "scripts": {
@@ -16,6 +16,10 @@
 		"services"
   ],
   "author": "Jonathan Boudreau <jonathan.boudreau.92@gmail.com>",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/AGhost-7/procnet"
+	},
   "license": "MIT",
   "dependencies": {
     "mk-fn": "^1.0.0"
