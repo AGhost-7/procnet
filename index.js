@@ -156,6 +156,43 @@ procnet.mockFn = function mockFn(promise, fn) {
 	});
 };
 
+/**
+ * Function which will return each value specified in the array in sequence
+ * for each call. Each value will be promisified.
+ *
+ * <code><pre>
+ * var values = [1, 2];
+ *
+ * var roller = procnet.rollingFn(promise, values);
+ *
+ * roller('foobar?'); // -> returns a resolved promise with the value 1.
+ * roller('foobaz!'); // -> returns a resolved promise with the value 2.
+ * roller('fooboo');  // -> returns a resolved promise with the value undefined.
+ *
+ * </pre></code>
+ * 
+ * This is useful for mocking functions such as database access functions.
+ *
+ * @static
+ * @function rollingFn
+ * @param {function} promise Is a promise factory.
+ * @param {array} values Are the values the function will return on each
+ * subsequent call.
+ * @param {number} ln Is the length property of the function. This parameter is
+ * optional.
+ */ 
+procnet.rollingFn = function rollingFn(promise, values, ln) {
+	var iterator = 0;
+	var fn = function() {
+		return promise(function(resolve, reject) {
+			resolve(values[iterator++]);
+		});
+	};
+
+	if(ln !== undefined) return mkFn(ln, fn);
+	else return fn;
+};
+
 /** 
  * Takes in a object with functions and ensures that they always return a promise. Useful 
  * for injecting them into services as fake networked remotes.

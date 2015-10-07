@@ -3,7 +3,7 @@
 var Promise = require('bluebird');
 var expect = require('chai').expect;
 var procnet = require('../index');
-//var pogo = require('pogostick-http');
+
 var promise = function(res) { return new Promise(res); };
 
 var math = require('./services/math');
@@ -47,60 +47,16 @@ describe('service unit tests', function() {
 				expect(res).to.equal(12);
 			});
 	});
+
+	it('should return one each value in order', function() {
+		var roller = procnet.rollingFn(promise, [1,2]);
+		return Promise.all([
+			roller(), roller()
+		]).spread(function(val1, val2){
+			expect(val1).to.equal(1);
+			expect(val2).to.equal(2);
+		});
+	});
 });
 
-//var remoteLoad = require('../lib/remoteLoad');
-//
-//describe('loading services', function() {
-//	var config = {
-//		math: {
-//			ip: 8001,
-//			host: 'localhost'
-//		},
-//		rectangle: {
-//			ip: 8002,
-//			host: 'localhost'
-//		}
-//	};
-//	var mkServer = pogo.server();
-//	var promiseFactory = function(f) { return new Promise(f); };
-//	var loadSimple = remoteLoad.primitiveLoader(pogo.client(promiseFactory));
-//	var mathService = math();
-//
-//	// I need to be able to load services using a requestFactory.
-//	// This means I also require this, and need some level of injectability
-//	// to keep boilerplate at a minimum.
-//	it('should accept dependencies and return a service generator', function() {
-//		expect(loadSimple).to.be.instanceof(Function);
-//	});
-//
-//	it('should be able to load empty deps', function(done) {
-//		
-//		// Now I need to mock my stuff...
-//		loadSimple(math._dependencies, config, function(err, remotes) {
-//			expect(err).to.not.exist;
-//			expect(remotes).to.be.empty;
-//			done();
-//		});
-//
-//	});
-//
-//	it('should load dependencies', function(done) {
-//		this.timeout(20000);
-//		// load the math server
-//		var server = mkServer(mathService);	
-//		
-//		server.listen(config.math.ip, function(err){
-//			//load the services and then check if its working		
-//			loadSimple(rectangle._dependencies, config, function(err, remotes) {
-//				expect(err).to.not.exist;
-//				expect(remotes.length).to.equal(1);
-//				done();
-//			});
-//
-//		});
-//	});
-//
-//	
-//	
-//});
+
