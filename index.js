@@ -2,6 +2,7 @@
 'use strict';
 
 var mkFn = require('mk-fn');
+var extend = require('extend');
 
 /** @module procnet */
 var procnet = {};
@@ -11,9 +12,10 @@ var procnet = {};
  *
  * @function service
  * @static
- * @param {array} dependencies Is an array of strings where each string is the name of the
- * service that the service requires to run.
- * @param {function} factory Is the funciton which returns the list of procedures. 
+ * @param {array} dependencies Is an array of strings where each string is the
+ * name of the service that the service requires to run.
+ * @param {function} factory Is the funciton which returns the list of 
+ * procedures. 
  * @returns function
  */
 procnet.service = function service (dependencies, factory) {	
@@ -24,8 +26,8 @@ procnet.service = function service (dependencies, factory) {
 };
 
 /** 
- * Takes the configuration with the type and then the name and changes it into a object 
- * with the name of the services as the key.
+ * Takes the configuration with the type and then the name and changes it into 
+ * a object with the name of the services as the key.
  *
  * @private
  * @function _flattenConfig
@@ -54,10 +56,11 @@ procnet._flattenConfig = function _flattenConfig(config) {
  * @static
  * @function _loadServices
  * @param {object} factories Is a promise factory.
- * @param {object} config Is the flattened configuration file for all dependencies.
+ * @param {object} config Is the flattened configuration file for all 
+ * dependencies.
  * @param {array} dependencies Is an array of the dependency names.
- * @param {function} cb Complete handler. Either get and error or an array of the 
- * remotes in the order given by the dependencies argument.
+ * @param {function} cb Complete handler. Either get and error or an array of
+ * the remotes in the order given by the dependencies argument.
  * @returns void
  */
 procnet._loadServices = function _loadServices(factories, config, dependencies, cb) {
@@ -80,17 +83,17 @@ procnet._loadServices = function _loadServices(factories, config, dependencies, 
 };
 
 /** 
- * Asynchronous dependency loader for setting up services. This will load up the service 
- * and return the precedures object that the service generates.
+ * Asynchronous dependency loader for setting up services. This will load up 
+ * the service and return the precedures object that the service generates.
  *
  * @static
  * @function loader
- * @param {object} factories Is a map of service names which translate to a function 
- * accepting an option and a callback.
- * @param {object} config The configuration is used to store data which could be 
- * server-specific as well as other things such as ip addresses. Each factory is given the
- * corresponding configuration needed to create the instance it is being asked to 
- * generate.
+ * @param {object} factories Is a map of service names which translate to a 
+ * function accepting an option and a callback.
+ * @param {object} config The configuration is used to store data which could 
+ * be server-specific as well as other things such as ip addresses. Each 
+ * factory is given the corresponding configuration needed to create the 
+ * instance it is being asked to generate.
  * @returns function
  */
 procnet.loader = function loader(factories, config) {
@@ -110,13 +113,14 @@ procnet.loader = function loader(factories, config) {
 };
 
 /** 
- * A client is nothing more than a consumer. A good example would be a  server with a REST
- * api trying to call remote services using procnet. It could of course also be a browser 
- * client trying to fetch data from remote servers.
+ * A client is nothing more than a consumer. A good example would be a  server 
+ * with a REST api trying to call remote services using procnet. It could of 
+ * course also be a browser client trying to fetch data from remote servers.
  *
  * @static
  * @function client
- * @param {object} factories Contains all of the instanciators for the service types.
+ * @param {object} factories Contains all of the instanciators for the service 
+ * types.
  * @param {object} config Has the configuration for each of the services.
  * @see loader
  */ 
@@ -137,8 +141,9 @@ procnet.client = function client(factories, config) {
 };
 
 /** 
- * Utility function for mocking service procedures for unit testing. It only makes the 
- * function always returna promise, which generated services don't always do.
+ * Utility function for mocking service procedures for unit testing. It only 
+ * makes the function always returna promise, which generated services don't 
+ * always do.
  *
  * @static
  * @function mockFn
@@ -194,14 +199,14 @@ procnet.rollingFn = function rollingFn(promise, values, ln) {
 };
 
 /** 
- * Takes in a object with functions and ensures that they always return a promise. Useful 
- * for injecting them into services as fake networked remotes.
+ * Takes in a object with functions and ensures that they always return a 
+ * promise. Useful for injecting them into services as fake networked remotes.
  *
  * @static
  * @function mockRemote
  * @param {function} promise is a promise factory.
- * @param {object} mock is the set of functions to mock. Can also contain objects, where 
- * the functons inside of that object will be mocked.
+ * @param {object} mock is the set of functions to mock. Can also contain 
+ * objects, where the functons inside of that object will be mocked.
  * @returns object
  */ 
 procnet.mockRemote = function mockRemote(promise, mock) {
@@ -216,9 +221,9 @@ procnet.mockRemote = function mockRemote(promise, mock) {
 };
 
 /** 
- * To unit test, one will need to use mocking due to the services having external 
- * dependencies. Since procnet is so simple, you can still call directly the procedures 
- * once the service is instantianted.
+ * To unit test, one will need to use mocking due to the services having 
+ * external dependencies. Since procnet is so simple, you can still call 
+ * directly the procedures once the service is instantianted.
  *
  * <code><pre>
  * var rectangle = procnet.service(['math'], function(math) {
@@ -247,8 +252,8 @@ procnet.mockRemote = function mockRemote(promise, mock) {
  * @function mocker
  * @param {function} promise is the promise factory
  * @param {object} mocks is an object where the key is the name of the service.
- * @param {function} service is the function returning an object will all of the 
- * procedures.
+ * @param {function} service is the function returning an object will all of 
+ * the procedures.
  * @returns function
  */
 procnet.mocker = function mocker(promise) {
@@ -260,6 +265,72 @@ procnet.mocker = function mocker(promise) {
 
 		return procnet.mockRemote(promise, service.apply(null, mocked));
 	};
+};
+
+/**
+ * This allows you to more or less do integration testing while still avoiding
+ * to make network calls.
+ *
+ * <code><pre>
+ *
+ * var leafs = {
+ * 	postgres: function() {},
+ * 	math: procnet.mockRemote(math)
+ * };
+ *
+ * var recangle = procnet.service(['math'], function(math) {
+ * 	return {
+ * 		surface: function(w, h) {
+ * 			return math.multiply(w, w);
+ * 		}
+ * 	};
+ * });
+ *
+ * var services = procnet.mockCluster(leafs, { rectangle: rectangle });
+ *
+ * services.rectangle.surface(10, 2).then(function(res) {
+ * 	assert.equal(res, 20);
+ * });
+ * </pre></code>
+ * @static
+ * @function mockCluster
+ * @returns object
+ * @param {function} promise Is yet again, a promise factory.
+ * @param {object} leafs These are already loaded dependencies. For example,
+ * if you still want to have a real database connection, you can inject it into
+ * the cluster by adding its name and reference to the object.
+ * @param {object} branches Are services which need to be mocked.
+ */ 
+procnet.mockCluster = function mockCluster(promise, leafs, branches) {
+	
+	function mock(loaded, load) {
+
+		function isLoaded (serviceName) {
+			return loaded[serviceName] !== undefined;
+		}
+		
+		function mapService(serviceName) {
+			return loaded[serviceName];
+		}
+
+		for(var serviceName in load) {
+			var service = load[serviceName];
+			// if I can load the service with all of its requirements, do it!
+			var canLoad = service && service._dependencies.every(isLoaded);
+			if(canLoad) {
+				var deps = service._dependencies.map(mapService);
+				var loadedService = service.apply(null, deps);
+				loaded[serviceName] = procnet.mockRemote(promise, loadedService);
+				load[serviceName] = undefined;
+				return mock(loaded, load);
+			}
+		}
+
+		if(Object.keys(load) > 0) throw 'Could not load cluster';
+		return loaded;
+	}
+
+	return mock(extend({}, leafs), extend({}, branches));
 };
 
 module.exports = procnet;

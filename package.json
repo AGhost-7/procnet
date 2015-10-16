@@ -12,16 +12,17 @@
     "server",
     "client",
     "soa",
-		"microservices",
-		"services"
+    "microservices",
+    "services"
   ],
   "author": "Jonathan Boudreau <jonathan.boudreau.92@gmail.com>",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/AGhost-7/procnet"
-	},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AGhost-7/procnet"
+  },
   "license": "MIT",
   "dependencies": {
+    "extend": "^3.0.0",
     "mk-fn": "^1.0.0"
   },
   "devDependencies": {
@@ -31,5 +32,5 @@
     "jshint": "^2.8.0",
     "mocha": "^2.3.0",
     "pogostick-http": "^1.2.0"
-	}
+  }
 }
