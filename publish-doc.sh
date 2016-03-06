@@ -1,4 +1,7 @@
 read -p 'Commit message: ' msg
+if [ -f doc ]; then
+	rm -rf doc
+fi
 npm run doc
 git add -A
 git commit -m "$msg"
