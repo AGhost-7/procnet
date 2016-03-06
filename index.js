@@ -3,6 +3,7 @@
 
 var mkFn = require('mk-fn');
 var extend = require('extend');
+var path = require('path');
 
 /** @module procnet */
 var procnet = {};
@@ -22,7 +23,20 @@ procnet.service = function service (dependencies, factory) {
 	var instantiator = arguments.length > 1 ? arguments[1] : arguments[0];		
 	// This is NOT part of the public API and thus can be changed at any time.
 	instantiator._dependencies = arguments.length > 1 ? arguments[0] : [];
+	instantiator['@@service'] = true;
 	return instantiator;	
+};
+
+/**
+ * Returns the dependencies that need to be resoled and passed to the factory
+ * to create a service instance.
+ *
+ * @param {object} serviceFactory The factory which is used to create the
+ * service;
+ * @returns array
+ */
+procnet.dependencies = function dependencies(serviceFactory) {
+	return serviceFactory._dependencies;
 };
 
 /** 
@@ -331,6 +345,60 @@ procnet.mockCluster = function mockCluster(promise, leafs, branches) {
 	}
 
 	return mock(extend({}, leafs), extend({}, branches));
+};
+
+
+/**
+ * Similar to loader, but instead is synchronous. More useful if you're just
+ * using this library for dependency injection.
+ * 
+ * @param {object} toResolve Is the list of services that are either already
+ * loaded or need to be loaded.
+ * @returns {object} All the services loaded.
+ */
+procnet.resolve = function resolve(toResolve) {
+
+	var loaded = {};
+	// Don't need to load stuff which is already loaded...
+	var loading = Object.keys(toResolve).filter(function(depName) {
+		if(!toResolve[depName]['@@service']) {
+			loaded[depName] = toResolve[depName];
+			return false;
+		}
+		return true;
+	});
+
+
+	// finds the next thing to load.
+	var findNext = function() {
+		return loading.filter(function(name) {
+			var service = toResolve[name];
+			return service._dependencies.every(function(depName) {
+				return loaded[depName] !== undefined;
+			});
+		})[0];
+	};
+	var getDependencies = function(depNames) {
+		return depNames.map(function(depName) {
+			return loaded[depName];
+		});
+	};
+	var removeLoaded = function(name) {
+		return loading.filter(function(loadingName) {
+			return loadingName !== name;
+		});
+	};
+	while(loading.length > 0) {
+		var nextName = findNext();
+		if(nextName === undefined) 
+			throw new Error('Could not resolve dependencies');
+		var next = toResolve[nextName];
+		var deps = getDependencies(next._dependencies);
+		var nextLoaded = next.apply(null, deps);
+		loaded[nextName] = nextLoaded;
+		loading = removeLoaded(nextName);
+	}
+	return loaded;
 };
 
 module.exports = procnet;
