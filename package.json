@@ -1,7 +1,7 @@
 {
   "name": "procnet",
-  "version": "1.0.3",
-  "description": "procnet is a remote service provider",
+  "version": "1.1.3",
+  "description": "A tool for service oriented architecture or dependency injection.",
   "main": "index.js",
   "scripts": {
     "test": "mocha",
@@ -13,7 +13,8 @@
     "client",
     "soa",
     "microservices",
-    "services"
+    "services",
+		"dependency injection"
   ],
   "author": "Jonathan Boudreau <jonathan.boudreau.92@gmail.com>",
   "repository": {
