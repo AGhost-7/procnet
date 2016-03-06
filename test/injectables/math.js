@@ -1,6 +1,6 @@
 var procnet = require('../../index');
 
-module.exports = procnet.service(function() {
+module.exports = procnet.injectable(function() {
 	return {
 		add: function(a, b) {
 			return a + b;

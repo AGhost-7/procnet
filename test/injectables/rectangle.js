@@ -1,7 +1,7 @@
 
 var procnet = require('../../index');
 
-module.exports = procnet.service(['math'], function(math) {
+module.exports = procnet.injectable(['math'], function(math) {
 	return {
 		surface: function(w, h) {
 			return math.multiply(w, h);

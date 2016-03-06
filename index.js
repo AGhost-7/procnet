@@ -28,9 +28,17 @@ procnet.service = function service (dependencies, factory) {
 };
 
 /**
+ * @function injectable
+ * @static
+ * @alias service
+ */
+procnet.injectable = procnet.service;
+
+/**
  * Returns the dependencies that need to be resoled and passed to the factory
  * to create a service instance.
- *
+ * @function dependencies
+ * @static
  * @param {object} serviceFactory The factory which is used to create the
  * service;
  * @returns array
@@ -241,26 +249,26 @@ procnet.mockRemote = function mockRemote(promise, mock) {
  *
  * <code><pre>
  * var rectangle = procnet.service(['math'], function(math) {
- * 	return {
- * 		surface: function(a, b) {
- * 			return math.multiply(a, b);
- * 		}
- * 	};
+ *   return {
+ *     surface: function(a, b) {
+ *       return math.multiply(a, b);
+ *     }
+ *   };
  * });
  *
  * var mock = procnet.mocker(promiseFactory);
  *
  * var mocked = mock({
- * 	math: {
- * 		multiply: function(a, b) { return a + b; }
- * 	}
+ *   math: {
+ *     multiply: function(a, b) { return a + b; }
+ *   }
  * }, rectangle);
  *
  * mocked
- * 	.surface(2, 5)
- * 	.then(function(r) {
- * 		assert.equal(r, 7);
- * 	});
+ *   .surface(2, 5)
+ *   .then(function(r) {
+ *     assert.equal(r, 7);
+ *   });
  * </pre></code>
  * @static
  * @function mocker
@@ -288,22 +296,22 @@ procnet.mocker = function mocker(promise) {
  * <code><pre>
  *
  * var leafs = {
- * 	postgres: function() {},
- * 	math: procnet.mockRemote(math)
+ *   postgres: function() {},
+ *   math: procnet.mockRemote(math)
  * };
  *
  * var recangle = procnet.service(['math'], function(math) {
- * 	return {
- * 		surface: function(w, h) {
- * 			return math.multiply(w, w);
- * 		}
- * 	};
+ *   return {
+ *     surface: function(w, h) {
+ *       return math.multiply(w, w);
+ *     }
+ *   };
  * });
  *
  * var services = procnet.mockCluster(leafs, { rectangle: rectangle });
  *
  * services.rectangle.surface(10, 2).then(function(res) {
- * 	assert.equal(res, 20);
+ *   assert.equal(res, 20);
  * });
  * </pre></code>
  * @static
@@ -350,8 +358,38 @@ procnet.mockCluster = function mockCluster(promise, leafs, branches) {
 
 /**
  * Similar to loader, but instead is synchronous. More useful if you're just
- * using this library for dependency injection.
- * 
+ * using this library for dependency injection. Its really just synchronous
+ * by default instead of async.
+ *
+ * <code><pre>
+ *
+ * var math = procnet.service(function() {
+ *   return {
+ *     add: function(a, b) { return a + b; },
+ *     double: function(a) { return a * 2; }
+ *   };
+ * });
+ *
+ * var rectangle = procnet.service(['math'], function(math) {
+ *   return {
+ *     perimeter: function(h, w) {
+ *       return math.add(math.double(h), math.double(w));
+ *     }
+ *   };
+ * });
+ *
+ * var services = {
+ *   'rectangle': rectangle,
+ *   'math': math
+ * };
+ *
+ * var loaded = procnet.resolve(services);
+ *
+ * console.log(loaded.perimeter(1, 1)); // => 4
+ * 	
+ * </pre></code>
+ * @function resolve
+ * @static
  * @param {object} toResolve Is the list of services that are either already
  * loaded or need to be loaded.
  * @returns {object} All the services loaded.
