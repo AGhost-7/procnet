@@ -68,9 +68,9 @@
 
 
 <div class="description">
-    A client is nothing more than a consumer. A good example would be a  server with a REST
-api trying to call remote services using procnet. It could of course also be a browser 
-client trying to fetch data from remote servers.
+    A client is nothing more than a consumer. A good example would be a  server 
+with a REST api trying to call remote services using procnet. It could of 
+course also be a browser client trying to fetch data from remote servers.
 </div>
 
 
@@ -122,7 +122,8 @@ client trying to fetch data from remote servers.
 
             
 
-            <td class="description last">Contains all of the instanciators for the service types.</td>
+            <td class="description last">Contains all of the instanciators for the service 
+types.</td>
         </tr>
 
     
@@ -186,7 +187,7 @@ client trying to fetch data from remote servers.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line112">line 112</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line129">line 129</a>
     </li></ul></dd>
     
 
@@ -231,8 +232,8 @@ client trying to fetch data from remote servers.
 
 
 <div class="description">
-    Asynchronous dependency loader for setting up services. This will load up the service 
-and return the precedures object that the service generates.
+    Asynchronous dependency loader for setting up services. This will load up 
+the service and return the precedures object that the service generates.
 </div>
 
 
@@ -284,8 +285,8 @@ and return the precedures object that the service generates.
 
             
 
-            <td class="description last">Is a map of service names which translate to a function 
-accepting an option and a callback.</td>
+            <td class="description last">Is a map of service names which translate to a 
+function accepting an option and a callback.</td>
         </tr>
 
     
@@ -308,10 +309,10 @@ accepting an option and a callback.</td>
 
             
 
-            <td class="description last">The configuration is used to store data which could be 
-server-specific as well as other things such as ip addresses. Each factory is given the
-corresponding configuration needed to create the instance it is being asked to 
-generate.</td>
+            <td class="description last">The configuration is used to store data which could 
+be server-specific as well as other things such as ip addresses. Each 
+factory is given the corresponding configuration needed to create the 
+instance it is being asked to generate.</td>
         </tr>
 
     
@@ -352,7 +353,7 @@ generate.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line82">line 82</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line99">line 99</a>
     </li></ul></dd>
     
 
@@ -393,6 +394,218 @@ generate.</td>
 
     
 
+    <h4 class="name" id=".mockCluster"><span class="type-signature">(static) </span>mockCluster<span class="signature">(promise, leafs, branches)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    This allows you to more or less do integration testing while still avoiding
+to make network calls.
+
+<code><pre>
+
+var leafs = {
+	postgres: function() {},
+	math: procnet.mockRemote(math)
+};
+
+var recangle = procnet.service(['math'], function(math) {
+	return {
+		surface: function(w, h) {
+			return math.multiply(w, w);
+		}
+	};
+});
+
+var services = procnet.mockCluster(leafs, { rectangle: rectangle });
+
+services.rectangle.surface(10, 2).then(function(res) {
+	assert.equal(res, 20);
+});
+</pre></code>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>promise</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Is yet again, a promise factory.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>leafs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">These are already loaded dependencies. For example,
+if you still want to have a real database connection, you can inject it into
+the cluster by adding its name and reference to the object.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>branches</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Are services which need to be mocked.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line284">line 284</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    object
+</div>
+
+
+
+    
+
+
+
+        
+            
+
+    
+
     <h4 class="name" id=".mocker"><span class="type-signature">(static) </span>mocker<span class="signature">(promise, mocks, service)</span><span class="type-signature"></span></h4>
 
     
@@ -400,9 +613,9 @@ generate.</td>
 
 
 <div class="description">
-    To unit test, one will need to use mocking due to the services having external 
-dependencies. Since procnet is so simple, you can still call directly the procedures 
-once the service is instantianted.
+    To unit test, one will need to use mocking due to the services having 
+external dependencies. Since procnet is so simple, you can still call 
+directly the procedures once the service is instantianted.
 
 <code><pre>
 var rectangle = procnet.service(['math'], function(math) {
@@ -524,8 +737,8 @@ mocked
 
             
 
-            <td class="description last">is the function returning an object will all of the 
-procedures.</td>
+            <td class="description last">is the function returning an object will all of 
+the procedures.</td>
         </tr>
 
     
@@ -566,7 +779,7 @@ procedures.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line218">line 218</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line237">line 237</a>
     </li></ul></dd>
     
 
@@ -614,8 +827,9 @@ procedures.</td>
 
 
 <div class="description">
-    Utility function for mocking service procedures for unit testing. It only makes the 
-function always returna promise, which generated services don't always do.
+    Utility function for mocking service procedures for unit testing. It only 
+makes the function always returna promise, which generated services don't 
+always do.
 </div>
 
 
@@ -731,7 +945,7 @@ function always returna promise, which generated services don't always do.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line139">line 139</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line157">line 157</a>
     </li></ul></dd>
     
 
@@ -779,8 +993,8 @@ function always returna promise, which generated services don't always do.
 
 
 <div class="description">
-    Takes in a object with functions and ensures that they always return a promise. Useful 
-for injecting them into services as fake networked remotes.
+    Takes in a object with functions and ensures that they always return a 
+promise. Useful for injecting them into services as fake networked remotes.
 </div>
 
 
@@ -855,8 +1069,8 @@ for injecting them into services as fake networked remotes.
 
             
 
-            <td class="description last">is the set of functions to mock. Can also contain objects, where 
-the functons inside of that object will be mocked.</td>
+            <td class="description last">is the set of functions to mock. Can also contain 
+objects, where the functons inside of that object will be mocked.</td>
         </tr>
 
     
@@ -897,7 +1111,7 @@ the functons inside of that object will be mocked.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line196">line 196</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line215">line 215</a>
     </li></ul></dd>
     
 
@@ -1100,7 +1314,7 @@ optional.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line159">line 159</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line178">line 178</a>
     </li></ul></dd>
     
 
@@ -1190,8 +1404,8 @@ optional.</td>
 
             
 
-            <td class="description last">Is an array of strings where each string is the name of the
-service that the service requires to run.</td>
+            <td class="description last">Is an array of strings where each string is the
+name of the service that the service requires to run.</td>
         </tr>
 
     
@@ -1214,7 +1428,8 @@ service that the service requires to run.</td>
 
             
 
-            <td class="description last">Is the funciton which returns the list of procedures.</td>
+            <td class="description last">Is the funciton which returns the list of 
+procedures.</td>
         </tr>
 
     
@@ -1255,7 +1470,7 @@ service that the service requires to run.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line9">line 9</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line11">line 11</a>
     </li></ul></dd>
     
 
@@ -1313,7 +1528,7 @@ service that the service requires to run.</td>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.3</a> on Tue Oct 06 2015 20:18:01 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Sun Mar 06 2016 13:35:27 GMT-0500 (EST)
 </footer>
 
 <script> prettyPrint(); </script>
