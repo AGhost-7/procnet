@@ -4,6 +4,7 @@
 var mkFn = require('mk-fn');
 var extend = require('extend');
 var path = require('path');
+var getParams = require('get-parameter-names');
 
 /** @module procnet */
 var procnet = {};
@@ -22,7 +23,8 @@ var procnet = {};
 procnet.service = function service (dependencies, factory) {	
 	var instantiator = arguments.length > 1 ? arguments[1] : arguments[0];		
 	// This is NOT part of the public API and thus can be changed at any time.
-	instantiator._dependencies = arguments.length > 1 ? arguments[0] : [];
+	instantiator._dependencies = arguments.length > 1 ? arguments[0] : getParams(instantiator);
+
 	instantiator['@@service'] = true;
 	return instantiator;	
 };

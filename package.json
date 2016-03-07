@@ -1,37 +1,38 @@
 {
-	"name": "procnet",
-	"version": "1.1.4",
-	"description": "A tool for service oriented architecture or dependency injection.",
-	"main": "index.js",
-	"scripts": {
-		"test": "mocha",
-		"doc": "jsdoc -d doc index.js"
-	},
-	"keywords": [
-		"rpc",
-		"server",
-		"client",
-		"soa",
-		"microservices",
-		"services",
-		"dependency injection"
-	],
-	"author": "Jonathan Boudreau <jonathan.boudreau.92@gmail.com>",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/AGhost-7/procnet"
-	},
-	"license": "MIT",
-	"dependencies": {
-		"extend": "^3.0.0",
-		"mk-fn": "^1.0.0"
-	},
-	"devDependencies": {
-		"bluebird": "^2.10.0",
-		"chai": "^3.2.0",
-		"jsdoc": "^3.3.2",
-		"jshint": "^2.8.0",
-		"mocha": "^2.3.0",
-		"pogostick-http": "^1.2.0"
-	}
+  "name": "procnet",
+  "version": "1.2.4",
+  "description": "A tool for service oriented architecture or dependency injection.",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha",
+    "doc": "jsdoc -d doc index.js"
+  },
+  "keywords": [
+    "rpc",
+    "server",
+    "client",
+    "soa",
+    "microservices",
+    "services",
+    "dependency injection"
+  ],
+  "author": "Jonathan Boudreau <jonathan.boudreau.92@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AGhost-7/procnet"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "extend": "^3.0.0",
+    "get-parameter-names": "^0.2.0",
+    "mk-fn": "^1.0.0"
+  },
+  "devDependencies": {
+    "bluebird": "^2.10.0",
+    "chai": "^3.2.0",
+    "jsdoc": "^3.3.2",
+    "jshint": "^2.8.0",
+    "mocha": "^2.3.0",
+    "pogostick-http": "^1.2.0"
+  }
 }

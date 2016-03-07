@@ -1,9 +1,6 @@
 var procnet = require('../../index');
 
-module.exports = procnet.service([
-	'rectangle', 
-	'triangle'
-], function(rectangle, triangle) {
+module.exports = procnet.service(function(rectangle, triangle) {
 	return {
 		rectangle: function(w, h) {
 			return rectangle.surface(w, h).then(function(res) {
