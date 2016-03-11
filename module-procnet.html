@@ -187,7 +187,7 @@ types.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line137">line 137</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line164">line 164</a>
     </li></ul></dd>
     
 
@@ -327,7 +327,7 @@ service;</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line37">line 37</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line64">line 64</a>
     </li></ul></dd>
     
 
@@ -415,7 +415,7 @@ service;</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line30">line 30</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line57">line 57</a>
     </li></ul></dd>
     
 
@@ -574,7 +574,7 @@ instance it is being asked to generate.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line107">line 107</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line134">line 134</a>
     </li></ul></dd>
     
 
@@ -786,7 +786,7 @@ the cluster by adding its name and reference to the object.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line292">line 292</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line319">line 319</a>
     </li></ul></dd>
     
 
@@ -1000,7 +1000,7 @@ the procedures.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line245">line 245</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line272">line 272</a>
     </li></ul></dd>
     
 
@@ -1166,7 +1166,7 @@ always do.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line165">line 165</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line192">line 192</a>
     </li></ul></dd>
     
 
@@ -1332,7 +1332,7 @@ objects, where the functons inside of that object will be mocked.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line223">line 223</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line250">line 250</a>
     </li></ul></dd>
     
 
@@ -1373,7 +1373,7 @@ objects, where the functons inside of that object will be mocked.</td>
 
     
 
-    <h4 class="name" id=".resolve"><span class="type-signature">(static) </span>resolve<span class="signature">(toResolve)</span><span class="type-signature"> &rarr; {object}</span></h4>
+    <h4 class="name" id=".resolve"><span class="type-signature">(static) </span>resolve<span class="signature">(toResolve)</span><span class="type-signature"> &rarr; {object|promise}</span></h4>
 
     
 
@@ -1382,18 +1382,18 @@ objects, where the functons inside of that object will be mocked.</td>
 <div class="description">
     Similar to loader, but instead is synchronous. More useful if you're just
 using this library for dependency injection. Its really just synchronous
-by default instead of async.
+by default instead of forcing all functions to return a promise.
 
 <code><pre>
 
-var math = procnet.service(function() {
+var math = procnet.injectable(function() {
   return {
     add: function(a, b) { return a + b; },
     double: function(a) { return a * 2; }
   };
 });
 
-var rectangle = procnet.service(['math'], function(math) {
+var rectangle = procnet.injectable(['math'], function(math) {
   return {
     perimeter: function(h, w) {
       return math.add(math.double(h), math.double(w));
@@ -1409,7 +1409,33 @@ var services = {
 var loaded = procnet.resolve(services);
 
 console.log(loaded.perimeter(1, 1)); // => 4
-	
+</pre></code>
+
+
+This function also supports async dependency loading, where an injectable
+returns a promise instead of a instance. In this case the function will
+return a promise. This is useful for injectables which need to load data
+from databases and such.
+
+<code><pre>
+var numberCache = procnet.injectable(function() {
+  return Promise.resolve({
+    1: 'One',
+    2: 'Two',
+    3: 'Three'
+  });
+});
+var add = procnet.injectable(function(numberCache) {
+  return function(x, y) { return x + y; };
+});
+
+var loadedAsync = procnet.resolve({
+  numberCache: numberCache,
+  add: add
+});
+loadedAsync.then(function(loaded) {
+  loaded.add(1, 2); // => 'Three'
+});
 </pre></code>
 </div>
 
@@ -1504,7 +1530,7 @@ loaded or need to be loaded.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line359">line 359</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line487">line 487</a>
     </li></ul></dd>
     
 
@@ -1531,7 +1557,8 @@ loaded or need to be loaded.</td>
 
         
 <div class="param-desc">
-    All the services loaded.
+    All the services loaded. If some of the service instances are
+returned as promises then the object returned will also be a promise.
 </div>
 
 
@@ -1543,6 +1570,9 @@ loaded or need to be loaded.</td>
     <dd>
         
 <span class="param-type">object</span>
+|
+
+<span class="param-type">promise</span>
 
 
     </dd>
@@ -1719,7 +1749,7 @@ optional.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line186">line 186</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line213">line 213</a>
     </li></ul></dd>
     
 
@@ -1757,7 +1787,32 @@ optional.</td>
 
 
 <div class="description">
-    More like syntatic sugar for defining services.
+    More like syntatic sugar for defining services. You can list your dependencies
+array to query them later.
+<code><pre>
+var foo = procnet.service(['bar'], function(bar) {
+  return {
+    foobar: function() { return 'foo' + bar; }
+  };
+});
+procnet.dependencies(foo); // => ['bar']
+var instance = foo('bar');
+instance.foobar(); // => 'foobar'
+</pre></code>
+
+You also have the option of omitting the array and listing your dependencies
+directly just like with angular modules. It will infer what you mean
+automatically.
+<code><pre>
+var rectangle = procnet.injectable(function(math) {
+  return {
+    perimeter: function(h, w) {
+      return math.add(math.double(h), math.double(w));
+    }
+  };
+});
+procnet.dependencies(rectangle); // => ['math']
+</pre></code>
 </div>
 
 
@@ -1875,7 +1930,7 @@ procedures.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line11">line 11</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line12">line 12</a>
     </li></ul></dd>
     
 
@@ -1933,7 +1988,7 @@ procedures.</td>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Sun Mar 06 2016 14:08:46 GMT-0500 (EST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Thu Mar 10 2016 21:05:22 GMT-0500 (EST)
 </footer>
 
 <script> prettyPrint(); </script>
