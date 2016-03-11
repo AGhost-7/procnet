@@ -1,6 +1,6 @@
 {
   "name": "procnet",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "description": "A tool for service oriented architecture or dependency injection.",
   "main": "index.js",
   "scripts": {
