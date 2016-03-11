@@ -43,5 +43,28 @@ describe('procnet for dependency injection', function() {
 			var loaded = procnet.resolve(injectables);
 			expect(loaded.rectangle).to.not.have.property('@@service');
 		});
+		it('should be able to load async items', function() {
+			var injectables = autorequire({
+				'math': './injectables/math',
+				'rectangle': './injectables/rectangle',
+				'async': './injectables/async'
+			});
+			return procnet.resolve(injectables).then(function(loaded) {
+				expect(loaded.async).to.exit;
+				expect(loaded.async.add(2, 2)).to.be.equal(4);
+			});
+		});
+		it('should be able to load multi-layered async items', function() {
+			var injectables = autorequire({
+				'math': './injectables/math',
+				'rectangle': './injectables/rectangle',
+				'async': './injectables/async',
+				'async2': './injectables/async2'
+			});
+			return procnet.resolve(injectables).then(function(loaded) {
+				expect(loaded.async2).to.exit;
+				expect(loaded.async2.add(2, 2)).to.be.equal(4);
+			});
+		});
 	});
 });
