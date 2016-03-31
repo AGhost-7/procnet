@@ -579,7 +579,6 @@ procnet.resolve = function(toResolve) {
 	var result = procnet._serviceInObj(toResolve);
 	var rest = result[0];
 	var loaded = result[1];
-	console.log('loaded:', loaded);
 
 	return procnet._resolveNext(rest, loaded);
 };
