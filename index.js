@@ -393,7 +393,7 @@ procnet.mockCluster = function mockCluster(promise, leafs, branches) {
 procnet._serviceInObj = function(obj) {
 	return Object.keys(obj).reduce(function(accu, depName) {
 		var ind = obj[depName]['@@service'] ? 0 : 1;
-		accu[ind][depName] = obj[depName]
+		accu[ind][depName] = obj[depName];
 
 		return accu;
 	}, [{}, {}]);
@@ -429,6 +429,7 @@ procnet._nextToResolve = function(notLoaded, loaded) {
 		var inj = notLoaded[k];
 
 		var deps = inj._dependencies;
+		if(deps.length === 0) return true;
 		return deps.every(function(depName) {
 			return loadedNames.indexOf(depName) > -1;
 		});
@@ -447,6 +448,27 @@ procnet._isAsync = function(val) {
 };
 
 /**
+ * Returns the items which weren't resolved.
+ *
+ * @function
+ * @static
+ * @private
+ */
+procnet._findMissingDepdendencies = function(rest, loaded) {
+	var missing = [];
+	var loadedKs = Object.keys(loaded);
+	Object.keys(rest).forEach(function(name) {
+		var injectable = rest[name];
+		procnet.dependencies(injectable).forEach(function(dep) {
+			if(missing.indexOf(dep) === -1 && loadedKs.indexOf(dep) === -1) {
+				missing.push(dep);
+			}
+		});
+	});
+	return missing;
+};
+
+/**
  * Walks to the next item to resolve. If there are async modules it will return
  * a promise, if not then it will return the resolved modules.
  */
@@ -456,7 +478,9 @@ procnet._resolveNext = function(rest, loaded) {
 	}
 	var nextName = procnet._nextToResolve(rest, loaded);
 	if(nextName === undefined) {
-		throw new Error('Could not resolve dependencies');
+		var missing = procnet._findMissingDepdendencies(rest, loaded);
+		var pretty = missing.map(function(m) { return '- ' + m; }).join('\n');
+		throw new Error('Could not resolve dependencies: \n' + pretty);
 	}
 
 	var next = rest[nextName];
@@ -555,6 +579,7 @@ procnet.resolve = function(toResolve) {
 	var result = procnet._serviceInObj(toResolve);
 	var rest = result[0];
 	var loaded = result[1];
+	console.log('loaded:', loaded);
 
 	return procnet._resolveNext(rest, loaded);
 };
